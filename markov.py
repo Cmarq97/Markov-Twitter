@@ -43,9 +43,14 @@ def make_chains(text_string):
 
 def make_text(chains):
     """Take dictionary of Markov chains; return random text."""
-
+    punctuation = '.'
     key = choice(chains.keys())
-    words = [key[0], key[1]]
+    while True:
+        if key[0][0].isupper() is True:
+            words = [key[0], key[1]]
+            break
+        else:
+            key = choice(chains.keys())
     while key in chains:
         # Keep looping until we have a key that isn't in the chains
         # (which would mean it was the end of our original text).
@@ -54,11 +59,15 @@ def make_text(chains):
         # it would run for a very long time.
 
         word = choice(chains[key])
-        if len(" ".join(words)) + len(word) < 140:
+        if len(" ".join(words)) + len(word) + 1 < 140:
             words.append(word)
             key = (key[1], word)
         else:
-            break
+            if punctuation in word:
+                words.append(word)
+                break
+            else:
+                break
     return " ".join(words)
 
 
@@ -76,6 +85,7 @@ def tweet(chains):
 
     #print api.VerifyCredentials()
     tweeted_status = make_text(chains)
+    #print tweeted_status
     status = api.PostUpdate(tweeted_status)
     print status.text
 
